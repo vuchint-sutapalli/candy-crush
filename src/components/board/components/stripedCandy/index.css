@@ -1,0 +1,9 @@
+.striped-candy {
+    width: 50px;
+    height: 50px;
+    transition: transform 0.5s;
+  }
+  
+  .striped-candy-animated {
+    transform: rotate(360deg);
+  }

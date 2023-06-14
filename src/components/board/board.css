@@ -1,0 +1,44 @@
+#board{
+    border: 5px solid lightblue;
+    border-radius: 10px;
+    display: flex;
+    flex-wrap: wrap;
+}
+
+#board img{
+    width: 50px;
+    height: 50px;
+}
+
+#board .empty{
+    width: 50px;
+    height: 50px;
+}
+
+
+
+@keyframes candyCrushAnimation {
+  0% {
+    opacity: 1;
+    /* transform: translateY(0); */
+  }
+  100% {
+    opacity: 0;
+    /* transform: translateY(100%); */
+  }
+}
+
+.element {
+  
+}
+
+/* Add styles for the disappearing elements */
+.element.hidden {
+  animation: candyCrushAnimation 1s ease-out forwards;
+  pointer-events: none;
+}
+
+/* Add styles for the falling down elements */
+.element.fall {
+  animation: candyCrushAnimation 0.3s ease-out forwards reverse;
+}
