@@ -165,8 +165,123 @@ const Board = ({rows, columns, colors}) => {
    
   }
 
+
+  function checkThreeInAColumn(currentArrangement) {
+    // Check horizontally for three in a row
+        let isMatchFound = false;
+        for (let col = 1; col <= columns; col++) {
+            for (let row = 1; row <= rows-2; row++) {
+
+                let elIndex = (row-1)*columns + col -1
+                const element = currentArrangement[elIndex]
+                if (
+                    element && element.color && 
+                    element.color === currentArrangement[elIndex+columns].color &&
+                    element.color === currentArrangement[elIndex+2*columns].color
+                ) {
+                    isMatchFound =true;
+                    console.log("found 3 in column!!")
+                    currentArrangement[elIndex] = currentArrangement[elIndex+columns] = currentArrangement[elIndex+2*columns] = {};
+
+                    setBoardColors([...currentArrangement])
+
+                    setTimeout(() => {
+                        moveElementsToFillVacantSpots(currentArrangement);
+                    }, 500);
+                // Found three in a row horizontally
+                // Perform your logic here (e.g., remove the matching elements, update the grid, etc.)
+                }
+        
+            }
+        }
+        return isMatchFound;
+    }
+
+    const checkHorizontalStripedCandy = (currentArrangement, row, col, squareBeingReplacedId) => {
+        let isMatchFound = false;
+
+        //     if column + 3 < matrix[row].length:
+//         if matrix[row][column] is same color as matrix[row][column+1] and
+//            matrix[row][column+1] is same color as matrix[row][column+2] and
+//            matrix[row][column+2] is same color as matrix[row][column+3]:
+//             // Striped candy found in a row
+//             markAsStripedCandy(matrix, row, column)
+//             markAsStripedCandy(matrix, row, column+1)
+//             markAsStripedCandy(matrix, row, column+2)
+//             markAsStripedCandy(matrix, row, column+3)
+
+        if(col+3 <= columns){
+            let index = (row-1)*columns + col -1 ;
+
+            // console.log(`index is ${index}`)
+            if (currentArrangement[index].color === currentArrangement[index+1].color &&
+                currentArrangement[index].color === currentArrangement[index+2].color &&
+                currentArrangement[index].color ===  currentArrangement[index+3].color) {
+
+                let matchedColor = currentArrangement[index].color;
+                let specialCandyIndex = squareBeingReplacedId || index;
+
+                isMatchFound =true;
+                console.log("found 4 in row!!")
+                // currentArrangement[index] = currentArrangement[index+1] = currentArrangement[index+2] = currentArrangement[index+3] = {
+                //     type: 'striped',
+                //     color: currentArrangement[index].color
+                // };
+                currentArrangement[index] = currentArrangement[index+1] = currentArrangement[index+2] = currentArrangement[index+3] = {};
+
+                if(![index, index+1, index+2, index+3].includes(squareBeingReplacedId)){
+                    specialCandyIndex = index;
+                }
+
+                currentArrangement[specialCandyIndex] = {
+                    type: 'striped',
+                    color: matchedColor
+                };
+
+                setBoardColors([...currentArrangement])
+
+                setTimeout(() => {
+                    moveElementsToFillVacantSpots(currentArrangement);
+                }, 500);
+
+            }
+
+        }
+        return isMatchFound;
+
+    }
+
+    const checkVerticalStripedCandy = (currentArrangement, row, col) => {
+        
+    }
+
+    const checkSpecialcandies = (currentArrangement, squareBeingReplacedId) => {
+
+        //     for each row in matrix:
+//         for each column in row:
+//             if matrix[row][column] is a candy:
+//                 checkHorizontalStripedCandy(matrix, row, column)
+//                 checkVerticalStripedCandy(matrix, row, column)
+        let isMatchFound = false;
+        for (let row = 1; row <= rows; row++) {
+            for (let col = 1; col <= columns; col++) {
+                let rowindex = (row-1)*columns + col
+                const element = currentArrangement[rowindex]
+
+                if (element && element.color){
+                    let hasFound = checkHorizontalStripedCandy(currentArrangement, row, col, squareBeingReplacedId)
+                    if(hasFound) {
+                        isMatchFound = true
+                    }
+                    // checkVerticalStripedCandy(currentArrangement, row, col)
+                }
+            }
+        }
+        return isMatchFound;
+    }
   function checkThreeInARow(currentArrangement) {
     // Check horizontally for three in a row
+    return false
         let isMatchFound = false;
         for (let row = 1; row <= rows; row++) {
             for (let col = 1; col <= columns-2; col++) {
@@ -186,7 +301,7 @@ const Board = ({rows, columns, colors}) => {
 
                     setTimeout(() => {
                         moveElementsToFillVacantSpots(currentArrangement);
-                    }, 2000);
+                    }, 500);
                 // Found three in a row horizontally
                 // Perform your logic here (e.g., remove the matching elements, update the grid, etc.)
                 }
@@ -232,9 +347,17 @@ const Board = ({rows, columns, colors}) => {
 
             // const isAColumnOfFour = checkForColumnOfFour();
             // const isARowOfFour = checkForRowOfFour();
-            // const isAColumnOfThree = checkForColumnOfThree();
-            const isARowOfThree = checkThreeInARow(currentArrangement)
-            if (squareBeingReplacedId && isValidMove && (isARowOfThree)) {
+            let isARowOfThree;
+            const isAColumnOfThree = checkThreeInAColumn(currentArrangement);
+            const hasSpecialCandies = checkSpecialcandies(currentArrangement, squareBeingReplacedId)
+            
+            // setTimeout(() => {
+            //     isARowOfThree = checkThreeInARow(currentArrangement)
+            // }, 0);
+
+
+
+            if (squareBeingReplacedId && isValidMove && (hasSpecialCandies || isAColumnOfThree )) {
                 setSquareBeingDragged(null);
                 setSquareBeingReplaced(null);
             }else {
@@ -282,12 +405,15 @@ const Board = ({rows, columns, colors}) => {
 
         const timer = setInterval(() => {
             boardColors.length && checkThreeInARow(boardColors);
+            boardColors.length && checkThreeInAColumn(boardColors);
+
+            // boardColors.length && checkSpecialcandies(boardColors);
         }, 100);
 
         return () => clearInterval(timer)
 
 
-  }, [checkThreeInARow, boardColors]);
+  }, [checkThreeInARow, checkThreeInAColumn, checkSpecialcandies, boardColors]);
 
 
 

@@ -45,7 +45,7 @@ const Candy = (props) => {
   return (
     <>
     {
-        props.type && props.type !== 'normal' ? (
+        props.type && props.type === 'normal' ? (
             <CommoncandySkeleton {...props}/>
         ) : (
             <StripedCandy {...props}>

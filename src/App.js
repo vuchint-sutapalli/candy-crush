@@ -22,7 +22,7 @@ function App() {
         >
           CANDY CRUSH
         </a>
-        <Boardcomponent rows={9} columns={5} colors= {['Red','Blue','Green','yellow','Orange','Purple']}/>
+        <Boardcomponent rows={9} columns={5} colors= {['Red','Blue','Green', 'Orange']}/>
         <Score />
       </header>
     </div>
